@@ -1,16 +1,17 @@
-import singer
-import pandas as pd
-
+import singer  # type: ignore
+import pandas as pd  # type: ignore
+import math
 
 LOGGER = singer.get_logger()  # type: ignore
 
+# Updated schema to match likely data types
 schema = {
     "properties": {
         "id": {"type": "string"},
         "name": {"type": "string"},
         "date_utc": {"type": "string", "format": "date-time"},
-        "engines": {"type": "string"},
-        "landing_legs": {"type": "string"},
+        "engines": {"type": "number"},  # assuming integer count
+        "landing_legs": {"type": "number"},  # assuming integer count
         "cost_per_launch": {"type": "number"},
         "success_rate_pct": {"type": "number"},
         "first_flight": {"type": "string"},
@@ -18,7 +19,7 @@ schema = {
         "company": {"type": "string"},
         "description": {"type": "string"},
         "wikipedia": {"type": "string"},
-        "boosters": {"type": "string"},
+        "boosters": {"type": "number"},  # assuming integer count
         "stages": {"type": "number"},
         "active": {"type": "boolean"},
         "type": {"type": "string"},
@@ -32,14 +33,25 @@ schema = {
 }
 
 
+# Helper function to clean out-of-range float values
+def clean_record(record):
+    for key, value in record.items():
+        if isinstance(value, float) and (math.isnan(value) or math.isinf(value)):
+            record[key] = None  # Replace problematic values with None
+    return record
+
+
 def main() -> None:
     url: str = "https://api.spacexdata.com/v4/launches"
-    df = pd.read_json(url)  # type: ignore
+    df = pd.read_json(url)
 
-    records = df.to_dict(orient="records")  # type: ignore
+    records = df.to_dict(orient="records")
 
-    singer.write_schema("launches", schema, "id")  # type: ignore
-    singer.write_records("launches", records)  # type: ignore
+    # Clean each record before passing it to `write_records`
+    cleaned_records = [clean_record(record) for record in records]
+
+    singer.write_schema("launches", schema, "id")
+    singer.write_records("launches", cleaned_records)
 
 
 if __name__ == "__main__":
