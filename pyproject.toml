@@ -8,8 +8,10 @@ authors = [
 
 requires-python = ">=3.11"
 dependencies = [
-    "pandas>=2.2.3",
-    "singer-python>=6.1.0",
+    "pandas<=2.2.3",
+    "singer-python==5.9.0",
+    "cffi>=1.9,<1.14",
+    "target-snowflake",
 ]
 
 
