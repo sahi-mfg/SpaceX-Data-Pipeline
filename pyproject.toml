@@ -1,0 +1,19 @@
+[project]
+name = "spaceX-Data-Pipeline"
+version = "0.1.0"
+description = "A data pipeline project for SpaceX data"
+authors = [
+    { name = "Sahi G.", email = "mohamedfrancissahi@gmail.com" }
+]
+
+requires-python = ">=3.11"
+dependencies = [
+    "pandas>=2.2.3",
+    "singer-python>=6.1.0",
+]
+
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.2.4"
+]
